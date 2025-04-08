@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Scanner</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+        }
+
+        header {
+            background-color: black;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        header img {
+            width: 200px;
+            height: 50px;
+        }
+
+        .back-button-container {
+            position: fixed;
+            top: 70px;
+            left: 15px;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        .container {
+            text-align: center;
+            margin-top: 120px;
+        }
+
+        .container h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        #scanButton {
+            padding: 15px 30px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 auto;
+            display: block;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        #scanButton:active {
+            background-color: #0056b3;
+        }
+
+        #loading {
+            font-size: 18px;
+            color: #007BFF;
+            text-align: center;
+            position: absolute;
+            top: 10px;
+            width: 100%;
+        }
+
+        #productInfo {
+            display: none;
+            text-align: center;
+            width: 80%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #comparisonContainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .product-card {
+            width: calc(50% - 20px);
+            padding: 15px;
+            border: 6px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            background-color: #fff;
+            transition: border-color 0.3s ease;
+        }
+
+        .product-card.low-impact {
+            border-color: green;
+        }
+
+        .product-card.high-impact {
+            border-color: red;
+        }
+
+        @media screen and (max-width: 768px) {
+            .product-card {
+                width: 100%;
+            }
+        }
+
+        video {
+              display: block;      /* or inline-block */
+              width: 100%;         /* or a fixed width like 640px */
+              height: auto;        /* or something like 480px */
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: none;
+        }
+
+        .guide-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 30%;
+            border: 2px dashed #007BFF;
+            box-sizing: border-box;
+            z-index: 1000;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="images/logo1.png" alt="The Green-scanner Logo">
+    </header>
+
+    <div class="back-button-container">
+        <a href="javascript:history.back()" class="back-button">&larr; Tillbaka</a>
+    </div>
+
+    <div class="container">
+        <h1 id="categoryMessage">Scan Two Products</h1>
+        <p id="categoryDescription" style="font-size: 18px;"></p>
+        <button id="scanButton">Open Camera</button>
+    </div>
+
+    <video id="video" autoplay></video>
+    <div class="guide-box"></div>
+
+    <p id="loading" hidden>Loading...</p>
+
+    <div id="productInfo">
+        <h2>Product Comparison</h2>
+        <div id="comparisonContainer"></div>
+    </div>
+
+    <div id="result" style="text-align: center; margin: 20px;"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <script src="app.js" type="module"></script>
+</body>
+</html>
