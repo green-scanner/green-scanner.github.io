@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize other elements
     video = document.getElementById('video');
     scanButton = document.getElementById('scanButton');
-    video = document.getElementById('video');
     loading = document.getElementById('loading');
     productInfo = document.getElementById('productInfo');
     comparisonContainer = document.getElementById('comparisonContainer');
@@ -62,17 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Handle tab focus and blur events
-document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && stream) {
-        video.srcObject = stream;
-        if (video) video.hidden = false;
-        if (guideBox) guideBox.hidden = false;
-    } else if (document.visibilityState === 'hidden') {
-        if (video) video.hidden = true;
-        if (guideBox) guideBox.hidden = true;
-    }
-});
+
 
 // Initialize Quagga for scanning
 async function openCamera() {
@@ -96,17 +85,11 @@ async function openCamera() {
         
         await video.play();
 
-        // ✅ Ensure the video element is visible and styled properly
-        video.hidden = false;
-        video.style.display = 'block';
-        video.style.visibility = 'visible';
-        video.style.opacity = '1';
-        video.style.width = '100%';
-        video.style.maxWidth = '640px';  // or any size that fits your layout
-        video.style.height = 'auto';
+   
         
         console.log('Video playing, initializing Quagga...');
-        
+        document.querySelector('.video-container').style.display = 'block';
+
         // Now initialize Quagga
         Quagga.init({
             inputStream: {
@@ -134,12 +117,36 @@ async function openCamera() {
             console.log("Quagga started successfully");
         });
 
+        let scannedCodes = new Set();
+        let isPaused = false;
+        
         Quagga.onDetected(async (result) => {
+            if (isPaused) return;
+
             const code = result.codeResult.code;
-            console.log("Barcode detected:", code);
-            await fetchProductInfo(code);
-            closeCamera();
+            result.textContent = `Barcode ${scannedCodes.size} scanned`;
+
+            if (!scannedCodes.has(code)) {
+                console.log("Barcode detected:", code);
+                scannedCodes.add(code);
+        
+                isPaused = true; // Pause scanning
+        
+                await fetchProductInfo(code);
+        
+                if (scannedCodes.size === 2) {
+                    closeCamera();
+                } else {
+                    // Delay next scan (e.g., 2 seconds)
+                    setTimeout(() => {
+                        isPaused = false;
+                    }, 2000);
+                }
+            } else {
+                console.log("Duplicate barcode ignored:", code);
+            }
         });
+        
 
     } catch (err) {
         console.error("Camera/Scanner error:", err);
