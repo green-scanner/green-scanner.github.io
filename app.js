@@ -120,32 +120,34 @@ async function openCamera() {
         let scannedCodes = new Set();
         let isPaused = false;
         
-        Quagga.onDetected(async (result) => {
-            if (isPaused) return;
+Quagga.onDetected(async (scanResult) => {
+    if (isPaused) return;
 
-            const code = result.codeResult.code;
-            result.textContent = `Barcode ${scannedCodes.size} scanned`;
+    const code = scanResult.codeResult.code;
 
-            if (!scannedCodes.has(code)) {
-                console.log("Barcode detected:", code);
-                scannedCodes.add(code);
-        
-                isPaused = true; // Pause scanning
-        
-                await fetchProductInfo(code);
-        
-                if (scannedCodes.size === 2) {
-                    closeCamera();
-                } else {
-                    // Delay next scan (e.g., 2 seconds)
-                    setTimeout(() => {
-                        isPaused = false;
-                    }, 2000);
-                }
-            } else {
-                console.log("Duplicate barcode ignored:", code);
-            }
-        });
+    if (!scannedCodes.has(code)) {
+        console.log("Barcode detected:", code);
+        scannedCodes.add(code);
+
+        if (result) result.textContent = `Streckkod hittad: ${code} (${scannedCodes.size}/2 skannade)`;
+
+        isPaused = true;
+
+        await fetchProductInfo(code);
+
+        if (scannedCodes.size === 2) {
+            result.textContent = 'Två produkter skannade – jämförelse pågår...';
+            closeCamera();
+        } else {
+            setTimeout(() => {
+                isPaused = false;
+            }, 2000);
+        }
+    } else {
+        console.log("Duplicate barcode ignored:", code);
+    }
+});
+
         
 
     } catch (err) {
@@ -157,6 +159,8 @@ async function openCamera() {
 // Function to close camera properly
 function closeCamera() {
     console.log('closeCamera() called');
+    document.querySelector('.video-container').style.display = 'none';
+
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
     }
@@ -217,6 +221,7 @@ async function fetchProductInfo(barcode) {
             });
 
             if (scannedProducts.length === 2) {
+                result.textContent = 'Två produkter har skannats! Jämförelse pågår...';
                 closeCamera();           // 🔒 Stop the camera
                 displayComparison();
 
@@ -234,6 +239,12 @@ async function fetchProductInfo(barcode) {
 
 // Display Comparison of Two Products
 async function displayComparison() {
+    // Hide the category message and description when showing comparison
+    const categoryMessage = document.getElementById('categoryMessage');
+    const categoryDescription = document.getElementById('categoryDescription');
+    if (categoryMessage) categoryMessage.style.display = 'none';
+    if (categoryDescription) categoryDescription.style.display = 'none';
+
     console.log('displayComparison() called');
     if (productInfo) productInfo.style.display = 'block';
     if (comparisonContainer) comparisonContainer.innerHTML = '';
