@@ -181,7 +181,7 @@ async function fetchProductInfo(barcode) {
         if (loading) loading.hidden = false;
         console.log('Fetching product info for barcode:', barcode);
 
-        const response = await fetch('https://green-scanner.github.io//scan', {
+        const response = await fetch('https://green-scanner.github.io/scan', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ barcode })
