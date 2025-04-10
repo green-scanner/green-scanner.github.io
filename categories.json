@@ -12,7 +12,7 @@
     "baljväxter": ["legumes", "lentils", "beans", "chickpeas", "peas", "soybeans", "baljväxter", "linser", "bönor", "kikärtor", "ärtor", "sojabönor"],
     "mjölk": ["milk", "whole milk", "skim milk", "low-fat milk", "organic milk", "dairy milk", "mjölk", "standardmjölk", "lättmjölk", "mellanmjölk", "ekologisk mjölk"],
     "fil": ["fermented milk", "filmjölk", "sour milk", "yogurt drink", "kefir", "fil", "ekologisk fil", "vaniljfil"],
-    "yoghurt": ["yogurt", "greek yogurt", "plain yogurt", "flavored yogurt", "dairy yogurt", "plant-based yogurt", "yoghurt", "naturell yoghurt", "smaksatt yoghurt"],
+    "yoghurt": ["Dairies","yogurt", "greek yogurt", "plain yogurt", "flavored yogurt", "dairy yogurt", "plant-based yogurt", "yoghurt", "naturell yoghurt", "smaksatt yoghurt"],
     "grädde": ["cream", "whipping cream", "heavy cream", "light cream", "matgrädde", "vispgrädde", "grädde", "laktosfri grädde"],
     "ost": ["cheese", "hard cheese", "soft cheese", "blue cheese", "cheddar", "parmesan", "mozzarella", "feta", "brie", "ost", "hårdost", "mjukost", "riven ost"],
     "smör": ["butter", "salted butter", "unsalted butter", "dairy butter", "smör", "äkta smör", "osaltat smör", "bregott"],
