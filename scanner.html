@@ -148,6 +148,7 @@
         background: black;
         display: none; /* Show when scanning starts */
 
+
     }
 
     .video-container video {
@@ -169,11 +170,28 @@
         pointer-events: none;
     }
 
+    .floating-result {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(255, 255, 255, 0.95);
+        color: #333;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 16px;
+        max-width: 85%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        z-index: 20;
+        text-align: center;
+    }
+
+
     </style>
 </head>
 <body>
     <header>
-        <img src="logo1.png" alt="The Green-scanner Logo">
+        <img src="images/logo1.png" alt="The Green-scanner Logo">
     </header>
 
     <div class="back-button-container">
@@ -189,6 +207,7 @@
     <div class="video-container">
         <video id="video" autoplay></video>
         <div class="guide-box"></div>
+        <div id="result" class="floating-result"></div>
     </div>
     
 
@@ -199,7 +218,6 @@
         <div id="comparisonContainer"></div>
     </div>
 
-    <div id="result" style="text-align: center; margin: 20px;"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <script src="app.js" type="module"></script>
