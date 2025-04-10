@@ -205,6 +205,15 @@ async function fetchProductInfo(barcode) {
 
             // Match the categories
             const matchedCategory = await matchCategory(data.product_info.categories.toString().toLowerCase()); // Use await here to resolve the promise
+            if (!matchedCategory) {
+                console.error("Matched category is undefined!");
+                return; // Exit or handle the error case
+            }
+            console.log("Matched category after fetching and before callin ecoimp..:", matchedCategory);
+
+            // Call calculateEcoImpact and pass the matched category
+            const ecoImpactResults = await calculateEcoImpact(data.product_info, matchedCategory);
+            console.log(ecoImpactResults);
 
             scannedProducts.push({
                 barcode: barcode,
