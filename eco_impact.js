@@ -80,7 +80,7 @@ async function calculateEcoImpact(product) {
 
 async function fetchCO2Emissions() {
     try {
-        const response = await fetch('co2_emissions.json');
+        const response = await fetch('co2_emission.json');
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
