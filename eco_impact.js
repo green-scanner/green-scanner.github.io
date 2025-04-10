@@ -15,30 +15,43 @@ function parseWeight(quantity) {
     return weight;
 }
 
+
 // Function to Calculate Eco-Impact Score
-async function calculateEcoImpact(product) {
+async function calculateEcoImpact(product, matchedCategory) {
     console.log("🟢 [INPUT PRODUCT DATA]:", product);
 
-    const { categories = "", quantity, origins, manufacturingPlace } = product;
+    const { quantity, origins = [], manufacturingPlace } = product; // Default origins to an empty array
 
-    // Match the most relevant category
-    const category = matchCategory(categories.toString().toLowerCase());
-    console.log(`🔍 Matched category: ${category}`);
+    // Log the matched category
+    console.log("🔍 Using matched category:", matchedCategory);
+
+    // Ensure matchedCategory is a lowercase string
+    if (typeof matchedCategory !== "string") {
+        console.error("🔥 Matched category is not a string!");
+        matchedCategory = 'default'; // Set to default if necessary
+    }
+
+    // Normalize the matched category to lowercase
+    const formattedCategory = matchedCategory.toLowerCase();
+    console.log(`🔍 Formatted category for lookup: ${formattedCategory}`);
 
     // Fetch CO2 emissions data
     const co2EmissionsData = await fetchCO2Emissions();
     const co2TransportData = await fetchTransportCO2();
 
+    // Define max and min emissions from the fetched emissions data
     const maxEmission = Math.max(...Object.values(co2EmissionsData));
     const minEmission = Math.min(...Object.values(co2EmissionsData));
 
+    // Define max and min transport emissions
     const maxTransportEmission = Math.max(...Object.values(co2TransportData));
     const minTransportEmission = Math.min(...Object.values(co2TransportData));
 
     // Get CO2 emissions per kg (fallbacks)
-    const co2EmissionPerKgRaw = co2EmissionsData[category] ?? 1.0;
+    const co2EmissionPerKgRaw = co2EmissionsData[formattedCategory] ?? 1.0; // Lookup emissions data
     console.log(`🏭 CO2 from production (per kg): ${co2EmissionPerKgRaw}`);
 
+    // Determine the country for transport emissions
     let rawCountry = Array.isArray(origins) ? origins[0] : origins || manufacturingPlace || "Unknown";
     let country = typeof rawCountry === "string" ? rawCountry.toLowerCase() : "unknown";
     console.log(`🌍 Detected country of origin: ${country}`);
@@ -85,6 +98,15 @@ async function calculateEcoImpact(product) {
         weightKg
     };
 }
+
+
+
+
+
+
+
+
+
 
 
 
