@@ -2,10 +2,10 @@ import { matchCategory } from './category_matcher.js';
 
 // Function to extract weight in kg
 function parseWeight(quantity) {
-    if (!quantity) return 1; // Default to 1 kg if missing
+    if (!quantity) return 0.5; // Default to 1 kg if missing
 
     const match = quantity.match(/([\d.]+)\s*(g|kg)/i);
-    if (!match) return 1; // Default if format is unexpected
+    if (!match) return 0.5; // Default if format is unexpected
 
     let weight = parseFloat(match[1]);
     if (match[2].toLowerCase() === "g") {
