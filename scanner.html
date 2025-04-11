@@ -137,54 +137,56 @@
             }
         }
 
-            .video-container {
-        position: relative;
-        width: 90%;
-        max-width: 600px;
-        margin: 20px auto;
-        border: 4px solid #007BFF;
-        border-radius: 10px;
-        overflow: hidden;
-        background: black;
-        display: none; /* Show when scanning starts */
+        .video-container {
+    position: relative;
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto;
+    border: 4px solid #007BFF;
+    border-radius: 10px;
+    overflow: hidden;
+    background: black;
+    display: none;
+}
 
+.video-container video {
+    width: 100%;
+    height: auto;
+    display: block;
+    position: relative; /* Ensure it's below the overlay elements */
+    z-index: 1;
+}
 
-    }
+.guide-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 30%;
+    border: 3px dotted #007BFF;
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 10;
+    display: block !important; /* <- Force visible */
+}
 
-    .video-container video {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
-
-    .guide-box {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 60%;
-        height: 30%;
-        border: 3px dotted #007BFF;
-        box-sizing: border-box;
-        z-index: 10;
-        pointer-events: none;
-    }
-
-    .floating-result {
-        position: absolute;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: rgba(255, 255, 255, 0.95);
-        color: #333;
-        padding: 12px 20px;
-        border-radius: 10px;
-        font-size: 16px;
-        max-width: 85%;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        z-index: 20;
-        text-align: center;
-    }
+.floating-result {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(255, 255, 255, 0.95);
+    color: #333;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 16px;
+    max-width: 85%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    z-index: 15;
+    text-align: center;
+    display: block !important; /* <- Force visible */
+}
 
 
     </style>
