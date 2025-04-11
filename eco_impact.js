@@ -19,6 +19,7 @@ function parseWeight(quantity) {
 // Function to Calculate Eco-Impact Score
 async function calculateEcoImpact(product, matchedCategory) {
     console.log("🟢 [INPUT PRODUCT DATA]:", product);
+    console.log("🟢 [INPUT MATCHED CATEGORY]:", matchedCategory);
 
     const { quantity, origins = [], manufacturingPlace } = product; // Default origins to an empty array
 
@@ -48,8 +49,10 @@ async function calculateEcoImpact(product, matchedCategory) {
     const minTransportEmission = Math.min(...Object.values(co2TransportData));
 
     // Get CO2 emissions per kg (fallbacks)
+    console.log("Formattedcategory:",formattedCategory); // Debugging    
     const co2EmissionPerKgRaw = co2EmissionsData[formattedCategory] ?? 1.0; // Lookup emissions data
     console.log(`🏭 CO2 from production (per kg): ${co2EmissionPerKgRaw}`);
+
 
     // Determine the country for transport emissions
     let rawCountry = Array.isArray(origins) ? origins[0] : origins || manufacturingPlace || "Unknown";
