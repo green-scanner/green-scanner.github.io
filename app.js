@@ -16,11 +16,7 @@ let scannedBarcodes = [];
 let scannedProducts = [];
 let stream = null;
 
-// Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-    
-
-    // Initialize other elements
     video = document.getElementById('video');
     scanButton = document.getElementById('scanButton');
     loading = document.getElementById('loading');
@@ -29,13 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     guideBox = document.querySelector('.guide-box');
     result = document.getElementById('result');
 
-    
-
-    console.log("Other elements initialized");
-
-    // Attach Event Listener to Scan Button
     scanButton.addEventListener('click', () => {
-        console.log('Scan button clicked');
         if (scannedBarcodes.length < 2) {
             openCamera();
         } else {
@@ -43,16 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Attach Event Listener to Back Button
     const backButton = document.querySelector('.back-button');
     if (backButton) {
-        backButton.addEventListener('click', () => {
-            console.log('Back button clicked');
-            history.back();
-        });
+        backButton.addEventListener('click', () => history.back());
     }
 
-    // Load any initial data
     const params = new URLSearchParams(window.location.search);
     const category = params.get('category');
     if (category) {
@@ -61,16 +46,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
-
-// Initialize Quagga for scanning
 async function openCamera() {
-    console.log('openCamera() called');
     try {
         if (loading) loading.hidden = false;
         if (result) result.textContent = 'Initializing camera...';
 
-        console.log('Requesting user media...');
         stream = await navigator.mediaDevices.getUserMedia({
             video: {
                 facingMode: "environment",
@@ -79,18 +59,12 @@ async function openCamera() {
             }
         });
 
-        console.log('User media obtained:', stream);
         video.srcObject = stream;
         video.playsInline = true;
-        
         await video.play();
 
-   
-        
-        console.log('Video playing, initializing Quagga...');
         document.querySelector('.video-container').style.display = 'block';
 
-        // Now initialize Quagga
         Quagga.init({
             inputStream: {
                 name: "Live",
@@ -109,81 +83,62 @@ async function openCamera() {
             frequency: 10
         }, function (err) {
             if (err) {
-                console.error("Quagga init error:", err);
                 alert("Scanner initialization failed: " + err.message);
                 return;
             }
             Quagga.start();
-            console.log("Quagga started successfully");
         });
 
         let scannedCodes = new Set();
         let isPaused = false;
-        
-Quagga.onDetected(async (scanResult) => {
-    if (isPaused) return;
 
-    const code = scanResult.codeResult.code;
+        Quagga.onDetected(async (scanResult) => {
+            if (isPaused) return;
 
-    if (!scannedCodes.has(code)) {
-        console.log("Barcode detected:", code);
-        scannedCodes.add(code);
+            const code = scanResult.codeResult.code;
 
-        if (result) result.textContent = `Streckkod hittad: ${code} (${scannedCodes.size}/2 skannade)`;
+            if (!scannedCodes.has(code)) {
+                scannedCodes.add(code);
+                if (result) result.textContent = `Streckkod hittad: ${code} (${scannedCodes.size}/2 skannade)`;
 
-        isPaused = true;
+                isPaused = true;
 
-        await fetchProductInfo(code);
+                await fetchProductInfo(code);
 
-        if (scannedCodes.size === 2) {
-            result.textContent = 'Två produkter skannade – jämförelse pågår...';
-            closeCamera();
-        } else {
-            setTimeout(() => {
-                isPaused = false;
-            }, 2000);
-        }
-    } else {
-        console.log("Duplicate barcode ignored:", code);
-    }
-});
-
-        
+                if (scannedCodes.size === 2) {
+                    result.textContent = 'Två produkter skannade – jämförelse pågår...';
+                    closeCamera();
+                } else {
+                    setTimeout(() => {
+                        isPaused = false;
+                    }, 2000);
+                }
+            }
+        });
 
     } catch (err) {
-        console.error("Camera/Scanner error:", err);
         alert("Could not access camera: " + err.message);
     }
 }
 
-// Function to close camera properly
 function closeCamera() {
-    console.log('closeCamera() called');
     document.querySelector('.video-container').style.display = 'none';
-
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-    }
+    if (stream) stream.getTracks().forEach(track => track.stop());
     if (video) video.hidden = true;
     if (guideBox) guideBox.hidden = true;
     Quagga.stop();
 }
 
-// Reset the Scanner
 function resetScanner() {
-    console.log('resetScanner() called');
     scannedBarcodes = [];
     scannedProducts = [];
     if (comparisonContainer) comparisonContainer.innerHTML = '';
     if (productInfo) productInfo.style.display = 'none';
 }
 
-
 async function fetchProductInfo(barcode) {
-    console.log('fetchProductInfo() called with barcode:', barcode);
     try {
         if (loading) loading.hidden = false;
-        console.log('Fetching product info for barcode:', barcode);
 
         const response = await fetch('https://green-scanner-github-io.onrender.com/scan', {
             method: 'POST',
@@ -193,124 +148,77 @@ async function fetchProductInfo(barcode) {
 
         const data = await response.json();
 
-        if (response.ok) {
-            if (!data.product_info) {
-                console.log('No product info found.');
-                return;
-            }
-            console.log('Categories from API:', data.product_info.categories);
+        if (response.ok && data.product_info) {
+            await loadCategories();
+            const matchedCategory = await matchCategory(data.product_info.categories.toString().toLowerCase());
+            if (!matchedCategory) return;
 
-            // Ensure categories are loaded before matching
-            await loadCategories();  // Wait for categories to load
-
-            // Match the categories
-            const matchedCategory = await matchCategory(data.product_info.categories.toString().toLowerCase()); // Use await here to resolve the promise
-            if (!matchedCategory) {
-                console.error("Matched category is undefined!");
-                return; // Exit or handle the error case
-            }
-            console.log("Matched category after fetching and before callin ecoimp..:", matchedCategory);
-
-            // Call calculateEcoImpact and pass the matched category
             const ecoImpactResults = await calculateEcoImpact(data.product_info, matchedCategory);
-            console.log(ecoImpactResults);
 
             scannedProducts.push({
-                barcode: barcode,
+                barcode,
                 name: data.product_info.name || 'No name available',
                 genericName: data.product_info.generic_name || 'No generic name available',
                 quantity: data.product_info.quantity || 'No quantity available',
                 packaging: data.product_info.packaging || 'No packaging info',
-                matchedCategory: matchedCategory || 'No category matched', // Use the resolved category
+                matchedCategory,
                 labels: data.product_info.labels || 'No labels available',
                 origins: data.product_info.origins || 'No origin information',
                 manufacturingPlace: data.product_info.manufacturing_place || 'No manufacturing place info',
                 ecoScore: data.product_info.ecoscore_grade || 'No eco-score available',
-                image: data.product_info.image || ''
+                image: data.product_info.image || '',
+                totalScore: ecoImpactResults.totalScore,
+                totalCo2Emission: ecoImpactResults.totalCo2Emission,
+                co2EmissionPerKg: ecoImpactResults.co2EmissionPerKg,
+                weightKg: ecoImpactResults.weightKg
             });
 
             if (scannedProducts.length === 2) {
                 result.textContent = 'Två produkter har skannats! Jämförelse pågår...';
-                closeCamera();           // 🔒 Stop the camera
+                closeCamera();
                 displayComparison();
-
             }
-        } else {
-            console.log(`Error: ${data.error}`);
         }
     } catch (err) {
         console.error('Error fetching product info:', err);
-        console.log('Failed to fetch product info.');
     } finally {
         if (loading) loading.hidden = true;
     }
 }
 
-// Display Comparison of Two Products
-async function displayComparison() {
-    // Hide the category message and description when showing comparison
+function displayComparison() {
     const categoryMessage = document.getElementById('categoryMessage');
     const categoryDescription = document.getElementById('categoryDescription');
     if (categoryMessage) categoryMessage.style.display = 'none';
     if (categoryDescription) categoryDescription.style.display = 'none';
 
-    console.log('displayComparison() called');
     if (productInfo) productInfo.style.display = 'block';
     if (comparisonContainer) comparisonContainer.innerHTML = '';
 
-    // Ensure you await the eco-impact calculation for both products
-    const ecoImpactPromises = scannedProducts.map(async (product) => {
-        const {
-            totalScore,
-            totalCo2Emission,
-            co2EmissionPerKg,
-            weightKg
-        } = await calculateEcoImpact(product);
+    const minScore = Math.min(...scannedProducts.map(p => p.totalScore));
+    const maxScore = Math.max(...scannedProducts.map(p => p.totalScore));
 
-        return {
-            product,
-            totalScore,
-            totalCo2Emission,
-            co2EmissionPerKg,
-            weightKg
-        };
-    });
-
-    // Wait for all the eco-impact calculations to resolve
-    const ecoImpactData = await Promise.all(ecoImpactPromises);
-
-    // Find the product with the lowest and highest eco-impact score
-    const minScore = Math.min(...ecoImpactData.map(data => data.totalScore));
-    const maxScore = Math.max(...ecoImpactData.map(data => data.totalScore));
-
-    ecoImpactData.forEach((ecoData) => {
-        const { product, totalScore, totalCo2Emission, co2EmissionPerKg, weightKg } = ecoData;
-
+    scannedProducts.forEach(product => {
         const productCard = document.createElement('div');
         productCard.classList.add('product-card');
 
-        // Apply green or red border based on eco-impact score
-        if (totalScore === minScore) {
+        if (product.totalScore === minScore) {
             productCard.classList.add('low-impact');
-        } else if (totalScore === maxScore) {
+        } else if (product.totalScore === maxScore) {
             productCard.classList.add('high-impact');
         }
 
-        // Display the product details and eco-impact scores
         productCard.innerHTML = `
             <p><strong>Name:</strong> ${product.name}</p>
             <p><strong>Matched category:</strong> ${product.matchedCategory}</p>
             <p><strong>Quantity:</strong> ${product.quantity}</p>
             <p><strong>Origins:</strong> ${product.origins}</p>
-
-            <p><strong>Eco-Impact Score:</strong> ${totalScore.toFixed(2)}</p>
-            <p><strong>Total CO2 Emission:</strong> ${totalCo2Emission.toFixed(2)} kg CO₂e</p>
-            <p><strong>CO2 Emission Per Kg:</strong> ${co2EmissionPerKg.toFixed(2)} kg CO₂e</p>
+            <p><strong>Eco-Impact Score:</strong> ${product.totalScore.toFixed(2)}</p>
+            <p><strong>Total CO2 Emission:</strong> ${product.totalCo2Emission.toFixed(2)} kg CO₂e</p>
+            <p><strong>CO2 Emission Per Kg:</strong> ${product.co2EmissionPerKg.toFixed(2)} kg CO₂e</p>
             <img src="${product.image}" alt="Product Image">
         `;
 
-        // Add the card to the container
         comparisonContainer.appendChild(productCard);
     });
 }
-
