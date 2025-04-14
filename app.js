@@ -2,11 +2,11 @@ import { loadCategories, matchCategory } from './category_matcher.js';
 import { calculateEcoImpact } from './eco_impact.js';
 
 const categoryDescriptions = {
-    "kött": "Köttproduktion har en stor påverkan på miljön, inklusive hög vattenförbrukning och utsläpp av växthusgaser.",
-    "fisk": "Fiskodling och fiske kan påverka havsmiljön och ekosystemen negativt.",
-    "mejeri": "Mejeriprodukter bidrar till utsläpp av växthusgaser och kräver mycket energi och vatten.",
-    "ris": "Risproduktion kräver mycket vatten och kan leda till utsläpp av metan, en potent växthusgas.",
-    "ägg": "Äggproduktion har en mindre miljöpåverkan jämfört med kött, men kräver ändå resurser och energi.",
+    "kött": "Köttproduktion har en betydande miljöpåverkan, då den kräver stora mängder vatten och mark. Den bidrar också till höga utsläpp av växthusgaser, särskilt metan från idisslare. Dessutom leder industrin ofta till avskogning och förlust av biologisk mångfald.",
+    "fisk": "Fiskodling och fiske kan påverka havsmiljön och ekosystemen negativt. Överfiske kan rubba den ekologiska balansen och hota vissa arter. Fiskodlingar kan dessutom sprida sjukdomar och kemikalier till vilda bestånd samt bidra till övergödning av vatten.",
+    "mejeri": "Mejeriprodukter bidrar till utsläpp av växthusgaser och kräver mycket energi och vatten. Kor släpper ut metan, en kraftfull växthusgas, vid matsmältningen. Dessutom innebär produktionen ofta intensiv markanvändning och foderodling som påverkar miljön negativt.",
+    "ris": "Risproduktion kräver mycket vatten och kan leda till utsläpp av metan, en potent växthusgas. Odling i översvämmade risfält skapar syrefria miljöer där metanproducerande bakterier trivs. Dessutom kan risodling bidra till vattenbrist i områden med redan begränsade resurser.",
+    "ägg": "Äggproduktion har en mindre miljöpåverkan jämfört med kött, men kräver ändå resurser och energi. Foderproduktion till höns bidrar till utsläpp och markanvändning. Dessutom används energi för uppvärmning, belysning och transport i hela produktionskedjan.",
     "övrigt": "Övriga livsmedel har varierande miljöpåverkan beroende på produktion och transport."
 };
 
